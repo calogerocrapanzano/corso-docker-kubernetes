@@ -1,0 +1,7 @@
+services:
+  web:
+    build: .
+    image: lezione1-nginx:compose
+    container_name: lezione1-web-compose
+    ports:
+      - "8080:80"
