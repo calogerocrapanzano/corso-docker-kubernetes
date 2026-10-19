@@ -1,0 +1,21 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: lezione5-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: scuola
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    container_name: lezione5-adminer
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql-data:
+    name: lezione5-mysql-data
