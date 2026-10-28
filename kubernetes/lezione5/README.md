@@ -1,5 +1,3 @@
-# L22-02
-
 ## Distribuire l’applicazione
 
     kubectl apply -f myapp.yaml
