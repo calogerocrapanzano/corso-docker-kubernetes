@@ -9,3 +9,4 @@ spec:
   selector:
     app: myapp
     type: front-end
+    
