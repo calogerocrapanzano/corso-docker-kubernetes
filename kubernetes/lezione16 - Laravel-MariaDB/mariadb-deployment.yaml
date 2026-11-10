@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lezione16-mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lezione16-mariadb
+  template:
+    metadata:
+      labels:
+        app: lezione16-mariadb
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:11.4
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              valueFrom: {secretKeyRef: {name: lezione16-mariadb, key: root-password}}
+            - name: MARIADB_DATABASE
+              valueFrom: {configMapKeyRef: {name: lezione16-mariadb, key: database}}
+            - name: MARIADB_USER
+              valueFrom: {configMapKeyRef: {name: lezione16-mariadb, key: username}}
+            - name: MARIADB_PASSWORD
+              valueFrom: {secretKeyRef: {name: lezione16-mariadb, key: password}}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+          readinessProbe:
+            exec: {command: [sh, -c, 'healthcheck.sh --connect --innodb_initialized']}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: lezione16-mariadb-data

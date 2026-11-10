@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lezione16-mariadb
+data:
+  database: lezione16
+  username: lezione16

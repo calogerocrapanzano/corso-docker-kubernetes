@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lezione16-laravel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lezione16-laravel
+  template:
+    metadata:
+      labels:
+        app: lezione16-laravel
+    spec:
+      initContainers:
+        - name: migrate
+          image: lezione16-laravel:1.0
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          command: [sh, -c]
+          args:
+            - |
+              until php -r '$c = @fsockopen(getenv("DB_HOST"), 3306); exit($c ? 0 : 1);'; do
+                echo Attendo MariaDB
+                sleep 3
+              done
+              php artisan migrate --seed --force
+          envFrom:
+            - configMapRef: {name: lezione16-laravel}
+            - secretRef: {name: lezione16-laravel}
+      containers:
+        - name: laravel
+          image: lezione16-laravel:1.0
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          ports: [{containerPort: 8000}]
+          envFrom:
+            - configMapRef: {name: lezione16-laravel}
+            - secretRef: {name: lezione16-laravel}
+          readinessProbe:
+            httpGet: {path: /up, port: 8000}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /up, port: 8000}
+            initialDelaySeconds: 30
+            periodSeconds: 20
