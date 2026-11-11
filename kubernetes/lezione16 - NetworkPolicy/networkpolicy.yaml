@@ -1,0 +1,83 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: networkpolicy-server-default-deny
+  namespace: test
+spec:
+  podSelector:
+    matchLabels:
+      app: networkpolicy-server
+  policyTypes:
+  - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: networkpolicy-server-allow-client
+  namespace: test
+spec:
+  podSelector:
+    matchLabels:
+      app: networkpolicy-server
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          access: allowed
+    ports:
+    - protocol: TCP
+      port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: networkpolicy-server-allow-egress-client
+  namespace: test
+spec:
+  podSelector:
+    matchLabels:
+      app: networkpolicy-server
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          access: egress-test
+    ports:
+    - protocol: TCP
+      port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: networkpolicy-egress-client-default-deny
+  namespace: test
+spec:
+  podSelector:
+    matchLabels:
+      access: egress-test
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: networkpolicy-egress-client-allow-server
+  namespace: test
+spec:
+  podSelector:
+    matchLabels:
+      access: egress-test
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: networkpolicy-server
+    ports:
+    - protocol: TCP
+      port: 80
