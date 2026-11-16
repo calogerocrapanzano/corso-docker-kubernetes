@@ -54,7 +54,7 @@ Il terzo Pod ha una policy di default deny sull'egress. Può raggiungere il
 server, ma non può effettuare richieste verso Internet:
 
     SERVICE_IP=$(kubectl get service networkpolicy-server -n test -o jsonpath='{.spec.clusterIP}')
-    kubectl exec -n test networkpolicy-egress-client -- curl -sS "http://${SERVICE_IP}"
+    kubectl exec -n test networkpolicy-egress-client -- curl -sS "http://10.43.13.125"
     kubectl exec -n test networkpolicy-egress-client -- curl -I --connect-timeout 3 https://www.google.com
     kubectl exec -n test networkpolicy-egress-client -- curl -I --connect-timeout 3 https://147.163.149.59 (unipa.it)
 
